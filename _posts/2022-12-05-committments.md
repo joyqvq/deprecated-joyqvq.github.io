@@ -3,7 +3,8 @@ layout: post
 title:  "All Things Commitments"
 date:   2022-12-05 20:00:00
 categories: crypto
-image: /assets/article_images/2022-12-08/commitment.JPG
+image: /assets/article_images/2022-12-08/commitment.jpg
+image2: /assets/article_images/2022-12-08/commitment.jpg
 ---
 
 # All Things Commitments
