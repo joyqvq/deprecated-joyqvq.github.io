@@ -7,7 +7,7 @@ image: /assets/article_images/2022-12-08/commitment.jpg
 image2: /assets/article_images/2022-12-08/commitment.jpg
 ---
 
-# All Things Commitments
+# Examining vector and polynomial commitments.
 
 "A promise is made, a promise is kept." How do we make commitments? 
 

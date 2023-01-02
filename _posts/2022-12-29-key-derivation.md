@@ -7,7 +7,7 @@ image: /assets/article_images/2022-12-29/keys.jpg
 image2: /assets/article_images/2022-12-29/keys.jpg
 ---
  
-# Annotations and Discussions on Key Derivation
+# A closer look on key derivations with relation to curve operations. 
  
 This post is a more general discussion on key derivation applying to broader cryptocurrency usage. You can find my writing on the Sui Network specifically [here](https://tech.mystenlabs.com/cryptography-in-sui-wallet-specifications/).
  
