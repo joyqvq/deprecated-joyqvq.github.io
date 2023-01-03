@@ -7,8 +7,9 @@ image: /assets/article_images/2022-12-29/keys.jpg
 image2: /assets/article_images/2022-12-29/keys.jpg
 ---
  
-# A closer look on key derivations with relation to curve operations. 
- 
+# A closer look on key derivations with relation to curve operations.
+
+
 This post is a more general discussion on key derivation applying to broader cryptocurrency usage. You can find my writing on the Sui Network specifically [here](https://tech.mystenlabs.com/cryptography-in-sui-wallet-specifications/).
  
 [BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) and [SLIP-0010](https://github.com/satoshilabs/slips/blob/master/slip-0010.md) are both excellent standards on **how** key management works, and they both have extensive implementations across many languages. However, I struggle to find a good reading on **why** some constructions are needed and **how** they relate to the RFCs on different curves. This post examines key derivations in the contexts of signature schemes.
@@ -203,7 +204,7 @@ This step is disallowed. Because the derived public key would not match with the
  
 The inability to induct public keys is, we can no longer set up a watch-only wallet for child public keys from the master public key. New address generation will always need to access the master private key.
  
-[BIP32-Ed25519](https://input-output-hk.github.io/adrestia/static/Ed25519_BIP.pdf) proposed a way for public key derivation by using the expanded private key $sk_{expand}$. However, there are restrictions on the max level of trees that can be only $2^20$ instead of $2^32$. Theoretically, a key recovery attack can be [performed](http://web.archive.org/web/20210513183118/https://forum.w3f.community/t/key-recovery-attack-on-bip32-ed25519/44) when the attacker can observe transaction spent with some child private keys.
+[BIP32-Ed25519](https://input-output-hk.github.io/adrestia/static/Ed25519_BIP.pdf) proposed a way for public key derivation by using the expanded private key $sk_{expand}$. However, there are restrictions on the max level of trees that can be only $2^{20}$ instead of $2^{32}$. Theoretically, a key recovery attack can be [performed](http://web.archive.org/web/20210513183118/https://forum.w3f.community/t/key-recovery-attack-on-bip32-ed25519/44) when the attacker can observe transaction spent with some child private keys.
  
 In conclusion, we had examined BIP-32 in relation to the Secp256k1 and the Ed25519 curve. SLIP-0010 is designed to avoid the problem with non-linear key space addition to disallow the public key derivation. As a result, majority of the protocols supporting Ed25519 key derivation still prefer SLIP-0010 with only hardened child private key derivation as the only secure option.
  
