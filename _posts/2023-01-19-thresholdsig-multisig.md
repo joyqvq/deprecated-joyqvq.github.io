@@ -3,8 +3,8 @@ layout: post
 title:  "A Look at Threshold Signature and Multisig Construction"
 date:   2023-01-19 20:00:00
 categories: crypto
-image: /assets/article_images/2022-12-29/keys.jpg
-image2: /assets/article_images/2022-12-29/keys.jpg
+image: /assets/article_images/2023-01-19/threshold.jpg
+image2: /assets/article_images/2023-01-19/threshold.jpg
 ---
  
 # Creating threshold signature and multisigs with Schnorr, how are they different and when to use which?
@@ -21,12 +21,12 @@ Some example applications include a wallet that is controlled by multiple stakeh
 
 Here we describe some of the desirable properties a multisig or threshold signature protocol would like to achieve. Different protocols have different emphasis and tradeoffs among them. 
 
-- Efficiency: The round of communications required should be minimized.
-- Robustness: The signing process can tolerate up to a certain number of malicious parties. Their presence would not stall the valid signature to be produced in a reasonable timeframe.
-- Asynchrony: Setting timeouts are not required such that the protocol can make progress without waiting for disruptive signers. Ideally, we only assume messages between honest parties arrive eventually.
-- Anonymity: The final signature should reveal nothing about the participating signers, including parameters like `t` and `n`.
-- Accountability: A valid signature identifies a set of parties that participated in signing. This is the counterpart to anonymity.
-- Updatability: Both `t` and `n` can be updated after key shares are generated, without changing the aggregated public key.
+- **Efficiency**: The round of communications required should be minimized.
+- **Robustness**: The signing process can tolerate up to a certain number of malicious parties. Their presence would not stall the valid signature to be produced in a reasonable timeframe.
+- **Asynchrony**: Setting timeouts are not required such that the protocol can make progress without waiting for disruptive signers. Ideally, we only assume messages between honest parties arrive eventually.
+- **Anonymity**: The final signature should reveal nothing about the participating signers, including parameters like `t` and `n`.
+- **Accountability**: A valid signature identifies a set of parties that participated in signing. This is the counterpart to anonymity.
+- **Updatability**: Both `t` and `n` can be updated after key shares are generated, without changing the aggregated public key.
 
 ## Interfaces: Threshold Signature vs. Multisig
 
@@ -40,7 +40,7 @@ Here we discuss the API interfaces for threshold and multisig, including key gen
 | `aggregate(sig_i for all i) -> sig_aggr` | `aggregate(m, (sig_i, pk_i) for all i) -> sig_aggr` | This step combines the partial signatures into one aggregated signature. The threshold signature setup only requires all partial signatures. However, for multisig, all public keys corresponding to all participating signatures are also required to produce the aggregated signature. |
 | `verify(sig_aggr, m, pk) -> true/false` | `verify(sig_aggr, m, pk_i for all i) -> true/false`  | In the threshold setting, the verify method only requires  the aggregated public key. For multisig, the verify method function needs to know all the participating public keys. |
 
-Aggregated signature signed over different messages is out of scope of this writing, multisig and threshold signature described here refers to signature committing to the same transaction. 
+(Note: Aggregated signature signed over different messages is out of scope of this writing, multisig and threshold signature described here refers to signature committing to the same transaction.)
 
 ## Differences and Tradeoffs
 
@@ -52,13 +52,15 @@ In the multisig setup, each signer can generate his own private and public keypa
 
 However, the key generation setup requires more care because each threshold signature participant **receives** (instead of generating with their own randomness) a private key share. The aggregated public key can be learned afterwards and the parameters `t` and `n` are both taken into account during generation. This gives raise to two different mechanisms:
 
-- Centralized dealer for key share generation: The most naive implementation here is that a trusted dealer can generate a global private key. By splitting the global private key using a simple yet powerful primitive: Shamir Secret Sharing Scheme, the dealer sends each party its corresponding key share.
+- **Centralized dealer**: The most naive implementation here is that a trusted dealer can generate a global private key. By splitting the global private key using a simple yet powerful primitive: Shamir Secret Sharing Scheme, the dealer sends each party its corresponding key share.
+
+This comes with few obvious tradeoffs: 1) The dealer is assumed to be honest that each key share is valid 2) The delivery of key share in the broadcast channel is assumed to be secure 3) The dealer is assumed to destroy the global private key.
 
 The first one can be alleviated by having each signer provide a zero-knowledge proof for correctness. The second tradeoff can be avoided with a setup like DKG below where it is guaranteed that no one learns about the global private key.
 
-- Distributed key generation: Generally speaking, this step runs in two rounds of communication. First, each participant acts like a central dealer of Feldman's VSS protocol. After each participant selects a secret x_i, they first broadcast a commitment to x_i others, and then broadcast a secret share of x_i. 
+- **Distributed key generation**: Generally speaking, this step runs in two rounds of communication. First, each participant acts like a central dealer of Feldman's VSS protocol. After each participant selects a secret $x_i$, they first broadcast a commitment to $x_i$ others, and then broadcast a secret share of $x_i$. 
 
-Note: There are many variants of the DKG protocol to discuss that are out of scope of this writing, so here we only briefly mention the simplified setup. See more on this topic [here](https://www.cs.umd.edu/~gasarch/TOPICS/secretsharing/feldmanVSS.pdf) and [here] (https://eprint.iacr.org/2021/005.pdf).
+Note: There are many variants of the DKG protocol to discuss that are out of scope of this writing, so here we only briefly mention the simplified setup. See more on this topic [here](https://www.cs.umd.edu/~gasarch/TOPICS/secretsharing/feldmanVSS.pdf) and [here](https://eprint.iacr.org/2021/005.pdf).
 
 ### Verifying Aggregated Signature
 
@@ -100,7 +102,7 @@ Here we discuss MuSig for `n-of-n` multisig. This is called a "partner wallet" s
 
 3. Each party computes a partial signature:
    
-   $s_i = r_i + c * \mu_i * sk_i$ where $c = H(pk_{aggr} || R_{aggr} || m)$
+   $s_i = r_i + c * \mu_i * sk_i$ where $c = H(pk_{aggr} \| R_{aggr} \| m)$
 
    > Here we see that $pk_{aggr}$ is taken into account for computing $c$. This is to prevent related-key attack where a third party can convert a signature `(R, s)` for public key P into a signature `(R, s + a * hash(R || m))` for public key `P + a * G` and the same message m. 
    
@@ -113,7 +115,7 @@ Here we discuss MuSig for `n-of-n` multisig. This is called a "partner wallet" s
 5. The verify step is the same as the vanilla signature, the ${pk_aggr} and $s_{aggr}$ is submitted. 
 
 References: 
-1. [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki): Schnorr Signatures for secp256k1
+1. [BIP-340](https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki): The native Schnorr Signatures spec for secp256k1 for Bitcoin. 
 
 2. [MuSig](https://eprint.iacr.org/2018/068.pdf): The construction discussed above. 
 
